@@ -2775,6 +2775,18 @@ Converse.Events.ROSTERUPDATED= 'CONVERSE-ROSTERUPDATED';
         'initialize': function (settings, callback) {
             converse.initialize(settings, callback);
             return converse
+        },
+        'getNumOnlineContacts': function(){
+            return converse.roster.getNumOnlineContacts();
+        },
+        'getContacts': function(){
+            return converse.roster.models;
+        },
+        'getContact': function(jid){
+            return converse.roster.rosteritemviews[jid].openChat(ev);
+        },
+        'openChat': function(ev, jid){
+            return converse.rosterview.rosteritemviews[jid].openChat(ev);
         }
     };
 }));
