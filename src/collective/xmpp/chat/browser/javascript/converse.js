@@ -6,6 +6,13 @@
  * Dual licensed under the MIT and GPL Licenses
  */
 
+var Converse = {};
+Converse.Events = {};
+Converse.Events.INITIALIZE = 'CONVERSE-INITIALIZE';
+Converse.Events.CONNECTED = 'CONVERSE-CONNECTED';
+Converse.Events.STATUSINITIALIZED = 'CONVERSE-STATUSINITIALIZED';
+Converse.Events.ROSTERUPDATED= 'CONVERSE-ROSTERUPDATED';
+
 // AMD/global registrations
 (function (root, factory) {
     if (console===undefined || console.log===undefined) {
@@ -1875,7 +1882,7 @@
                     this.$el.html(this.request_template(item.toJSON()));
                     converse.showControlBox();
                 } else if (subscription === 'both' || subscription === 'to') {
-                    _.each(['pending-xmpp-contact', 'requesting-xmpp-contact'], 
+                    _.each(['pending-xmpp-contact', 'requesting-xmpp-contact'],
                         function (cls) {
                             if (this.el.className.indexOf(cls) !== -1) {
                                 this.$el.removeClass(cls);
@@ -2274,7 +2281,7 @@
                     if (changed_presence) {
                         this.sortRoster(changed_presence)
                         sorted = true;
-                    } 
+                    }
                     if (item.get('is_last')) {
                         if (!sorted) {
                             this.sortRoster(item.get('chat_status'));
@@ -2303,6 +2310,7 @@
                 if (!$count.is(':visible')) {
                     $count.show();
                 }
+                $(Converse.Events).trigger(Converse.Events.ROSTERUPDATED);
                 return this;
             },
 
@@ -2736,7 +2744,9 @@
                 } else  {
                     this.callback();
                 }
+                $(Converse.Events).trigger(Converse.Events.STATUSINITIALIZED);
             }, this));
+            $(Converse.Events).trigger(Converse.Events.CONNECTED);
         };
 
         // This is the end of the initialize method.
@@ -2759,10 +2769,12 @@
             this.onConnected();
         }
         if (this.show_controlbox_by_default) { this.showControlBox(); }
+        $(Converse.Events).trigger(Converse.Events.INITIALIZED);
     };
     return {
         'initialize': function (settings, callback) {
             converse.initialize(settings, callback);
+            return converse
         }
     };
 }));
