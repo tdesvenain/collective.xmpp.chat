@@ -393,7 +393,9 @@ Converse.Events.ROSTERUPDATED= 'CONVERSE-ROSTERUPDATED';
                 } else  {
                     this.callback();
                 }
+                $(Converse.Events).trigger(Converse.Events.STATUSINITIALIZED);
             }, this));
+            $(Converse.Events).trigger(Converse.Events.CONNECTED);
         };
 
         // Backbone Models and Views
@@ -2419,22 +2421,6 @@ Converse.Events.ROSTERUPDATED= 'CONVERSE-ROSTERUPDATED';
                 return this;
             },
 
-            addRosterItemView: function (item) {
-                var view = new converse.RosterItemView({model: item});
-                this.rosteritemviews[item.id] = view;
-                return this;
-            },
-
-            removeRosterItemView: function (item) {
-                var view = this.rosteritemviews[item.id];
-                if (view) {
-                    view.$el.remove();
-                    delete this.rosteritemviews[item.id];
-                    this.render();
-                }
-                return this;
-            },
-
             renderRosterItem: function (item, view) {
                 if ((converse.show_only_online_users) && (item.get('chat_status') !== 'online')) {
                     view.$el.remove();
@@ -2846,102 +2832,6 @@ Converse.Events.ROSTERUPDATED= 'CONVERSE-ROSTERUPDATED';
             }
         });
 
-<<<<<<< HEAD
-        this.showControlBox = function () {
-            var controlbox = this.chatboxes.get('controlbox');
-            if (!controlbox) {
-                this.chatboxes.add({
-                    id: 'controlbox',
-                    box_id: 'controlbox',
-                    visible: true
-                });
-                if (this.connection) {
-                    this.chatboxes.get('controlbox').save();
-                }
-            } else {
-                controlbox.trigger('show');
-            }
-        };
-
-        this.toggleControlBox = function () {
-            if ($("div#controlbox").is(':visible')) {
-                var controlbox = this.chatboxes.get('controlbox');
-                if (this.connection) {
-                    controlbox.destroy();
-                } else {
-                    controlbox.trigger('hide');
-                }
-            } else {
-                this.showControlBox();
-            }
-        };
-
-        this.initStatus = function (callback) {
-            this.xmppstatus = new this.XMPPStatus();
-            var id = hex_sha1('converse.xmppstatus-'+this.bare_jid);
-            this.xmppstatus.id = id; // This appears to be necessary for backbone.localStorage
-            this.xmppstatus.localStorage = new Backbone.LocalStorage(id);
-            this.xmppstatus.fetch({success: callback, error: callback});
-        };
-
-        this.initRoster = function () {
-            // Set up the roster
-            this.roster = new this.RosterItems();
-            this.roster.localStorage = new Backbone.LocalStorage(
-                hex_sha1('converse.rosteritems-'+this.bare_jid));
-            this.connection.roster.registerCallback(
-                $.proxy(this.roster.rosterHandler, this.roster),
-                null, 'presence', null);
-            this.rosterview = new this.RosterView({'model':this.roster});
-        }
-
-        this.onConnected = function () {
-            if (this.debug) {
-                this.connection.xmlInput = function (body) { console.log(body); };
-                this.connection.xmlOutput = function (body) { console.log(body); };
-                Strophe.log = function (level, msg) { console.log(level+' '+msg); };
-                Strophe.error = function (msg) { console.log('ERROR: '+msg); };
-            }
-            this.bare_jid = Strophe.getBareJidFromJid(this.connection.jid);
-            this.domain = Strophe.getDomainFromJid(this.connection.jid);
-            this.features = new this.Features();
-            this.initStatus($.proxy(function () {
-                this.initRoster();
-                this.chatboxes.onConnected();
-                this.connection.addHandler(
-                    $.proxy(this.roster.subscribeToSuggestedItems, this.roster),
-                    'http://jabber.org/protocol/rosterx', 'message', null);
-
-                this.connection.addHandler(
-                        $.proxy(function (presence) {
-                            this.presenceHandler(presence);
-                            return true;
-                        }, this.roster), null, 'presence', null);
-
-                this.connection.addHandler(
-                        $.proxy(function (message) {
-                            this.chatboxes.messageReceived(message);
-                            return true;
-                        }, this), null, 'message', 'chat');
-
-                this.connection.roster.get(function () {});
-
-                $(window).on("blur focus", $.proxy(function(e) {
-                    if ((this.windowState != e.type) && (e.type == 'focus')) {
-                        converse.clearMsgCounter();
-                    }
-                    this.windowState = e.type;
-                },this));
-                this.giveFeedback(__('Online Contacts'));
-                if (this.testing) {
-                    this.callback(this);
-                } else  {
-                    this.callback();
-                }
-                $(Converse.Events).trigger(Converse.Events.STATUSINITIALIZED);
-            }, this));
-            $(Converse.Events).trigger(Converse.Events.CONNECTED);
-        };
         // Initialization
         // --------------
 
